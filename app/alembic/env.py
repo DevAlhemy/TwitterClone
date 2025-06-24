@@ -1,19 +1,18 @@
-import os
-import sys
-
-from logging.config import fileConfig
-
-from alembic import context
 from sqlalchemy import engine_from_config
+from logging.config import fileConfig
+from alembic import context
 from sqlalchemy import pool
+import sys
+import os
+
 
 # Тут добавили в пути нашу папку app, чтобы алембик её увидел.
 # Порядок импортов специально нарушен, т.к. код выполняется построчно
-sys.path.append(os.path.join(sys.path[0], 'src'))
+sys.path.append(os.path.join(sys.path[0], 'app'))
 
-from src.core.config import settings  # Добавили импорт нашего конфига
-from src.db.database import Base  # Добавили импорт нашей мета-БД
-from src.db.models import User  # Добавили импорт модели, чтобы она инициализировалась, но она не используется
+from core.config import settings  # Добавили импорт нашего конфига
+from db.database import Base  # Добавили импорт нашей мета-БД
+from db.models import User
 # без этого импорта алембик может не увидеть наши модели и создаст пустую миграцию
 
 

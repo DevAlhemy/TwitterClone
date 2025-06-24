@@ -1,4 +1,4 @@
-from src.db.models import User, Follow, Tweet
+from db import User, Follow, Tweet
 import pytest
 
 

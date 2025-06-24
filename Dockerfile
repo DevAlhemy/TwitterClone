@@ -22,4 +22,4 @@ EXPOSE 8000
 CMD ["sh", "-c", \
     "cd app && \
      ./backup/restore.sh && \
-     uvicorn src.main:app --host 0.0.0.0 --port 8000"]
+     uvicorn main:app --host 0.0.0.0 --port 8000"]

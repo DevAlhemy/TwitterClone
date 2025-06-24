@@ -1,8 +1,7 @@
 from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.db.database import get_db
-from src.db.models import User
 from sqlalchemy import select
+from db import get_db, User
 
 
 async def get_current_user(

@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String, ForeignKey, Text, DateTime, Table, Column, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from src.db.database import Base
 from datetime import datetime
+from .database import Base
 from typing import List
 
 

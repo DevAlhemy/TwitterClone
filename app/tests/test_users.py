@@ -1,4 +1,4 @@
-from src.db.models import User
+from db import User
 import pytest
 
 

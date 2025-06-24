@@ -54,19 +54,19 @@
 ## 📷 Примеры интерфейса
 
 ### Главная страница
-![Homepage](images/homepage.png)
+![Homepage](app/images/homepage.png)
 
 ### Создание твита
-![Tweet creation](images/tweet_create.png)
+![Tweet creation](app/images/tweet_create.png)
 
 ### Ввод api-key
-![Api key](images/api_key.png)
+![Api key](app/images/api_key.png)
 
 ### Отображение твита со стороны подписчика
-![New tweet](images/new_tweet.png)
+![New tweet](app/images/new_tweet.png)
 
 ### Профиль пользователя
-![Profile view](images/profile.png)
+![Profile view](app/images/profile.png)
 
 ## 🧑‍💻 Автор
 

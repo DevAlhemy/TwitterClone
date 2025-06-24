@@ -1,12 +1,11 @@
+from core.security import get_current_user, get_db, User
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.core.security import get_current_user
 from sqlalchemy import insert, delete, select
-from src.api.schemas.user import UserResponse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
-from src.db.models import User, Follow
-from src.db.database import get_db
+from schemas import UserResponse
+from db import Follow
 
 
 router = APIRouter()

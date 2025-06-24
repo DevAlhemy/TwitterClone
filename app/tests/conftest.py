@@ -1,10 +1,9 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from src.core.config import SettingsConfigDict, Settings
+from app.core import SettingsConfigDict, Settings
 from httpx import AsyncClient, ASGITransport
-from src.db.database import Base, get_db
-from src.db.models import User
+from db import get_db, Base, User
 from dotenv import find_dotenv
-from src.main import app
+from main import app
 import pytest
 
 

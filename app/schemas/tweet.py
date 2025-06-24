@@ -1,6 +1,6 @@
-from src.api.schemas.user import UserProfile
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
+from .user import UserProfile
 from datetime import datetime
 
 

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends
+from core.security import get_current_user, get_db, User
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.core.security import get_current_user
-from src.db.models import Media, User
-from src.db.database import get_db
+from db import Media
 import shutil
 import uuid
 import os

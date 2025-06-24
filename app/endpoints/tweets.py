@@ -1,12 +1,11 @@
 from fastapi import HTTPException, APIRouter, Depends, status
-from src.db.models import Tweet, Like, User, Follow, Media
 from sqlalchemy import select, func, desc, insert, delete
+from core.security import get_current_user, get_db, User
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.core.security import get_current_user
-from src.api.schemas.tweet import TweetCreate
+from db import Tweet, Like, Follow, Media
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
-from src.db.database import get_db
+from schemas import TweetCreate
 
 
 router = APIRouter()
