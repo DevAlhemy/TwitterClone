@@ -6,21 +6,14 @@ import sys
 import os
 
 
-# Тут добавили в пути нашу папку app, чтобы алембик её увидел.
-# Порядок импортов специально нарушен, т.к. код выполняется построчно
 sys.path.append(os.path.join(sys.path[0], 'app'))
 
-from core.config import settings  # Добавили импорт нашего конфига
-from db.database import Base  # Добавили импорт нашей мета-БД
+from core.config import settings
+from db.database import Base
 from db.models import User
-# без этого импорта алембик может не увидеть наши модели и создаст пустую миграцию
 
-
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
 
-# Добавили работу с секциями конфига / работу с переменными окружения, чтобы они стали доступны в alembic.ini
 section = config.config_ini_section
 config.set_section_option(section, "DB_HOST", settings.DB_HOST)
 config.set_section_option(section, "DB_PORT", settings.DB_PORT)
@@ -28,21 +21,10 @@ config.set_section_option(section, "DB_USER", settings.DB_USER)
 config.set_section_option(section, "DB_NAME", settings.DB_NAME)
 config.set_section_option(section, "DB_PASS", settings.DB_PASS)
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata  # И последнее - дописали, что наша целевая метаинформация содержится в классе Base
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
