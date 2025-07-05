@@ -21,5 +21,6 @@ EXPOSE 8000
 
 CMD ["sh", "-c", \
     "cd app && \
-     ./backup/restore.sh && \
+     alembic upgrade head && \
+     pytest tests -v && \
      uvicorn main:app --host 0.0.0.0 --port 8000"]

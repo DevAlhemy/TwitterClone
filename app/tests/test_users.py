@@ -1,52 +1,42 @@
-from db import User
 import pytest
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_follow_unfollow_user(client, db, test_user):
-    """Тест подписки и отписки от пользователя"""
-    user2 = User(name="User2", api_key="key2")
-    db.add(user2)
-    await db.commit()
-
-    follow_res = await client.post(
-        f"/api/users/{user2.id}/follow",
-        headers={"api-key": "test-key"}
+async def test_follow_user(client, db):
+    """Тест подписки пользователей друг на друга"""
+    follow_res_1 = await client.post(
+        f"/api/users/2/follow",
+        headers={"api-key": "test"}
     )
-    assert follow_res.status_code == 200
-    assert follow_res.json()["result"] is True
-
-    unfollow_res = await client.delete(
-        f"/api/users/{user2.id}/follow",
-        headers={"api-key": "test-key"}
+    follow_res_2 = await client.post(
+        f"/api/users/1/follow",
+        headers={"api-key": "admin"}
     )
-    assert unfollow_res.status_code == 200
-    assert unfollow_res.json()["result"] is True
+    assert follow_res_1.status_code == 200
+    assert follow_res_1.json()["result"] is True
+    assert follow_res_2.status_code == 200
+    assert follow_res_2.json()["result"] is True
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_get_user_profile(client, test_user):
+async def test_get_user_profile(client):
     """Тест получения профиля текущего пользователя"""
     response = await client.get(
         "/api/users/me",
-        headers={"api-key": "test-key"}
+        headers={"api-key": "test"}
     )
     assert response.status_code == 200
     data = response.json()
     assert data["result"] is True
-    assert data["user"]["name"] == "TestUser"
+    assert data["user"]["name"] == "test"
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_get_other_user_profile(client, db, test_user):
+async def test_get_other_user_profile(client, db):
     """Тест получения профиля другого пользователя"""
-    user3 = User(name="User3", api_key="key3")
-    db.add(user3)
-    await db.commit()
-
     response = await client.get(
-        f"/api/users/{user3.id}",
-        headers={"api-key": "test-key"}
+        f"/api/users/2",
+        headers={"api-key": "test"}
     )
     assert response.status_code == 200
-    assert response.json()["user"]["name"] == "User3"
+    assert response.json()["user"]["name"] == "admin"

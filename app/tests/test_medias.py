@@ -1,18 +1,17 @@
-from io import BytesIO
 import pytest
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_upload_media(client, test_user):
+async def test_upload_media(client):
     """Тест загрузки медиафайла"""
-    test_file = BytesIO(b"fake image data")
-    test_file.name = "test.jpg"
 
-    response = await client.post(
-        "/api/medias",
-        files={"file": ("test.jpg", test_file, "image/jpeg")},
-        headers={"api-key": "test-key"}
-    )
+    media_path = "media/cat.png"
+    with open(media_path, "rb") as file:
+        response = await client.post(
+            "/api/medias",
+            files={"file": ("cat.png", file, "image/png")},
+            headers={"api-key": "admin"}
+        )
     assert response.status_code == 201
     data = response.json()
     assert data["result"] is True

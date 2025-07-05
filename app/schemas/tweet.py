@@ -4,6 +4,11 @@ from .user import UserProfile
 from datetime import datetime
 
 
+class LikeInfo(BaseModel):
+    user_id: int
+    name: str
+
+
 class TweetCreate(BaseModel):
     tweet_data: str
     tweet_media_ids: Optional[List[int]] = None
@@ -15,11 +20,6 @@ class TweetOut(BaseModel):
     created_at: datetime
     author: UserProfile
     model_config = ConfigDict(from_attributes=True)
-
-
-class LikeInfo(BaseModel):
-    user_id: int
-    name: str
 
 
 class TweetFeedOut(BaseModel):

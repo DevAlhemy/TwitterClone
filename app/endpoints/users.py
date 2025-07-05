@@ -16,7 +16,24 @@ async def follow_user(
     id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
+) -> dict:
+    """
+    Подписаться на пользователя.
+
+    Args:
+        id: ID пользователя для подписки
+        db: Асинхронная сессия БД
+        current_user: Текущий аутентифицированный пользователь
+
+    Returns:
+        {"result": bool} - Результат операции
+
+    Raises:
+        400: Bad Request - если:
+            - Попытка подписаться на себя
+            - Уже подписаны на пользователя
+        401: Unauthorized - если пользователь не аутентифицирован
+    """
     if current_user.id == id:
         raise HTTPException(status_code=400, detail="Cannot follow yourself")
 
@@ -35,7 +52,21 @@ async def unfollow_user(
     id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
+) -> dict:
+    """
+    Отписаться от пользователя.
+
+    Args:
+        id: ID пользователя для отписки
+        db: Асинхронная сессия БД
+        current_user: Текущий аутентифицированный пользователь
+
+    Returns:
+        {"result": bool} - Результат операции
+
+    Raises:
+        401: Unauthorized - если пользователь не аутентифицирован
+    """
     stmt = delete(Follow).where(
         Follow.follower_id == current_user.id,
         Follow.following_id == id
@@ -47,9 +78,25 @@ async def unfollow_user(
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)
-):
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> UserResponse:
+    """
+    Получить профиль текущего пользователя.
+
+    Args:
+        db: Асинхронная сессия БД
+        current_user: Текущий аутентифицированный пользователь
+
+    Returns:
+        UserResponse: Полная информация о пользователе включая:
+            - Основные данные
+            - Список подписчиков
+            - Список подписок
+
+    Raises:
+        401: Unauthorized - если пользователь не аутентифицирован
+    """
     result = await db.execute(
         select(User)
         .where(User.id == current_user.id)
@@ -65,9 +112,31 @@ async def get_me(
 
 @router.get("/{id}", response_model=UserResponse)
 async def get_user_profile(
-        id: int,
-        db: AsyncSession = Depends(get_db)
-):
+    id: int,
+    db: AsyncSession = Depends(get_db)
+) -> UserResponse:
+    """
+    Получить профиль пользователя по ID.
+
+    Args:
+        id: ID запрашиваемого пользователя
+        db: Асинхронная сессия БД
+
+    Returns:
+        UserResponse: Полная информация о пользователе включая:
+            - Основные данные
+            - Список подписчиков
+            - Список подписок
+
+    Raises:
+        404: Not Found - если пользователь не найден
+            Формат ошибки:
+            {
+                "result": False,
+                "error_type": "not_found",
+                "error_message": "User not found"
+            }
+    """
     result = await db.execute(
         select(User)
         .where(User.id == id)

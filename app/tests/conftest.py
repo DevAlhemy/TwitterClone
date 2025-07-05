@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from app.core import SettingsConfigDict, Settings
+from core import SettingsConfigDict, Settings
 from httpx import AsyncClient, ASGITransport
 from db import get_db, Base, User
 from dotenv import find_dotenv
@@ -52,8 +52,10 @@ async def client():
 
 @pytest.fixture(scope='session', autouse=True)
 async def test_user(db):
-    user = User(name="TestUser", api_key="test-key")
-    db.add(user)
+    user1 = User(name="test", api_key="test")
+    user2 = User(name="admin", api_key="admin")
+    db.add(user1)
+    db.add(user2)
     await db.commit()
-    await db.refresh(user)
-    return user
+    await db.refresh(user1)
+    await db.refresh(user2)

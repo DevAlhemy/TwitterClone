@@ -3,7 +3,6 @@ from sqlalchemy import select, func, desc, insert, delete
 from core.security import get_current_user, get_db, User
 from sqlalchemy.ext.asyncio import AsyncSession
 from db import Tweet, Like, Follow, Media
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 from schemas import TweetCreate
 
@@ -16,7 +15,21 @@ async def create_tweet(
     tweet_in: TweetCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
+) -> dict:
+    """
+    Создает новый твит для текущего пользователя.
+
+    Args:
+        tweet_in: Данные для создания твита (текст и ID медиа)
+        db: Асинхронная сессия БД
+        current_user: Текущий аутентифицированный пользователь
+
+    Returns:
+        {"result": bool, "tweet_id": int} - ID созданного твита
+
+    Raises:
+        401: Если пользователь не аутентифицирован
+    """
     new_tweet = Tweet(user_id=current_user.id, content=tweet_in.tweet_data)
 
     if tweet_in.tweet_media_ids:
@@ -38,7 +51,23 @@ async def delete_tweet(
     tweet_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
+) -> dict:
+    """
+    Удаляет твит по ID, если он принадлежит текущему пользователю.
+
+    Args:
+        tweet_id: ID твита для удаления
+        db: Асинхронная сессия БД
+        current_user: Текущий аутентифицированный пользователь
+
+    Returns:
+        {"result": bool} - Результат операции
+
+    Raises:
+        403: Если твит не принадлежит пользователю
+        404: Если твит не найден
+        401: Если пользователь не аутентифицирован
+    """
     result = await db.execute(
         select(Tweet).where(Tweet.id == tweet_id)
     )
@@ -61,13 +90,26 @@ async def like_tweet(
     tweet_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
+) -> dict:
+    """
+    Добавляет лайк текущего пользователя к твиту.
+
+    Args:
+        tweet_id: ID твита для лайка
+        db: Асинхронная сессия БД
+        current_user: Текущий аутентифицированный пользователь
+
+    Returns:
+        {"result": bool} - Результат операции
+
+    Raises:
+        401: Если пользователь не аутентифицирован
+    """
     stmt = insert(Like).values(user_id=current_user.id, tweet_id=tweet_id)
-    try:
-        await db.execute(stmt)
-        await db.commit()
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="Already liked")
+
+    await db.execute(stmt)
+    await db.commit()
+
     return {"result": True}
 
 
@@ -76,21 +118,59 @@ async def unlike_tweet(
     tweet_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-):
+) -> dict:
+    """
+    Удаляет лайк текущего пользователя с твита.
+
+    Args:
+        tweet_id: ID твита для удаления лайка
+        db: Асинхронная сессия БД
+        current_user: Текущий аутентифицированный пользователь
+
+    Returns:
+        {"result": bool} - Результат операции
+
+    Raises:
+        401: Если пользователь не аутентифицирован
+    """
     stmt = delete(Like).where(
         Like.user_id == current_user.id,
         Like.tweet_id == tweet_id
     )
+
     await db.execute(stmt)
     await db.commit()
+
     return {"result": True}
 
 
 @router.get("", response_model=dict)
 async def get_feed(
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)
-):
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> dict:
+    """
+    Получает ленту твитов пользователей, на которых подписан текущий пользователь.
+
+    Args:
+        db: Асинхронная сессия БД
+        current_user: Текущий аутентифицированный пользователь
+
+    Returns:
+        {
+            "result": bool,
+            "tweets": List[{
+                "id": int,
+                "content": str,
+                "author": {"id": int, "name": str},
+                "likes": List[{"user_id": int, "name": str}],
+                "attachments": List[str]
+            }]
+        }
+
+    Raises:
+        401: Если пользователь не аутентифицирован
+    """
     try:
         following_result = await db.execute(
             select(Follow.following_id)
